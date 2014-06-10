@@ -746,14 +746,14 @@ class MockMaker
 	function overrideField(field:Field, f:Function)
 	{
 		if (!isInterface)
-		field.access.unshift(AOverride);
+			field.access.unshift(AOverride);
 
 		var args:Array<Expr> = [];
 
 		for (arg in f.args)
 		{
 			arg.type = normaliseComplexType(arg.type);
-			args.push(macro $i{arg.name});
+			args.push(macro cast $i{arg.name});
 		}
 		
 		var eMockOutcome = createMockFieldExprs(field, args);
@@ -862,15 +862,18 @@ class MockMaker
 	*/
 	function isVoidVoid(type:ComplexType):Bool
 	{
-		switch (type)
+		if (type != null)
 		{
-			case TFunction(args,ret): 
-				if (args.length == 0 && !isNotVoid(ret))
-				{
-					return true;
-				}
-			case _:
-				return false;
+			switch (type)
+			{
+				case TFunction(args,ret): 
+					if (args.length == 0 && !isNotVoid(ret))
+					{
+						return true;
+					}
+				case _:
+					return false;
+			}
 		}
 		return false;
 	}
@@ -965,42 +968,44 @@ class MockMaker
 		Creates a @mock metadata value for the field that is used at runtime
 		by MockProxy and MockMethod
 
+		Inclues
+			- arguments as qualified types (optional args prefixed with '?')
+			- default argument values (usually null, may differ on static targets)'
+			- return type (if applicable)
+
 		For example: 
 		
-			@mock([String, ?foo.Bar], returns.Something)
+			@mock(["String", "?foo.Bar"], [null,null], returns.Something)
 	*/
 	function createMockFieldMeta(field:Field, f:Function)
 	{
-		var mockArgs:Array<Expr> = [];
-		for (arg in f.args)
+		var args:Array<Expr> = [];
+
+		for (functionArg in f.args)
 		{
-			Console.log(arg);
+			Console.log(functionArg);
 
-			var value:String = arg.opt ? "?" : "";
-			var ident:String = "";
+			var value = functionArg.opt ? "?" : "";
 
-			//add the return type including if optional (?)
-			if (arg.type != null)
-			{
-				ident = arg.type.toString();
-				value += ident;
-			}
-			mockArgs.push(EConst(CString(value)).at());
+			if (functionArg.type != null)
+				value += functionArg.type.toString();
+	
+			args.push(macro $v{value});
 		}
 
-		var mockParams:Array<Expr> = [EArrayDecl(mockArgs).at()];
+		var mockParams:Array<Expr> = [EArrayDecl(args).at()];
 
 		if (f.ret != null && isNotVoid(f.ret))
 		{
 			var ident = f.ret.toString();
-			mockParams.push(EConst(CString(ident)).at());
+			mockParams.push(macro $v{ident});
 		}
 		else if (isVoidVoid(f.ret))
 		{
 			//is of type Void->Void
 			var voidType = updateVoidVoid(f.ret);
 			var ident = normaliseComplexType(voidType).toString();
-			mockParams.push(EConst(CString(ident)).at());
+			mockParams.push(macro $v{ident});
 		}
 
 		return {

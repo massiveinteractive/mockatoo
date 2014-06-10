@@ -1,3 +1,21 @@
+## 3.1.2
+
+- updated haxelib description
+- Merge pull request #35 from jasononeil/patch-2 Null check on isVoidVoid()
+- Merge pull request #34 from jasononeil/patch-1 Fix for PHP
+
+## 3.1.1
+
+- fixed cpp issues in haxe 3.0.x
+
+## 3.1.0
+
+- updated read me
+- issue #21 - added automatic injection of `Matcher.any` for missing arguments on stubs
+- issue #23 - fixed mock method with type parameters
+- fixed incorrect posInfos on verify exceptions
+- issue #26 - added `mock.verifyZeroInteractions()`
+
 ## 3.0.3
 
 - added in dev dependency for hamcrest

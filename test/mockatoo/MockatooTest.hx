@@ -134,8 +134,14 @@ class MockatooTest
 		result = mock.one(10);
 
 		Assert.areEqual(2, result);
-		Mockatoo.verify(mock, times(2)).one(10);
+		Mockatoo.verify(mock, times(1)).one(10);
 
+		mock.one(10);
+		mock.one(10);
+
+		Mockatoo.verify(mock, times(2)).one(10);		
+
+		mock.one(10);
 		Mockatoo.reset(mock);
 
 		result = mock.one(10);
@@ -163,7 +169,7 @@ class MockatooTest
 		Assert.areEqual(null, result);
 		#end
 
-		Mockatoo.verify(mock, times(2)).one(10);
+		Mockatoo.verify(mock, times(1)).one(10);
 	}
 
 	// ------------------------------------------------------------------------- generics & typedefs
@@ -727,6 +733,30 @@ class MockatooTest
 		mock.myVal = o;
 		Mockatoo.verify(mock.set_myVal(o));
 
+	}
+
+	@Test
+	public function should_mock_Issue23()
+	{
+		var real = new TypedMethod();
+		real.test(1);
+		Assert.isTrue(true);
+		
+		var mock = Mockatoo.mock(TypedMethod);
+		mock.test(1);
+		Mockatoo.verify(mock.test(1));
+	}
+
+	@Test
+	public function should_support_untyped_method_args_and_returns()
+	{
+		var mock = Mockatoo.mock(ClassWithoutTypedArgs);
+
+		mock.untypedArg("");
+		mock.untypedReturn();
+
+		Mockatoo.verify(mock.untypedArg(""));
+		Mockatoo.verify(mock.untypedReturn());
 	}
 
 	// ------------------------------------------------------------------------- utilities
