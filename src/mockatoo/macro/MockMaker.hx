@@ -734,6 +734,7 @@ class MockMaker
 		f.args.push(spyArg);
 
 		//deliberately call return before call to super
+		//when this is not a spy
 		//to prevent target class constructor being executed
 		var exprs:Array<Expr> = [eMockConstructorExprs,eReturn, e];
 		f.expr = EBlock(exprs).at();
