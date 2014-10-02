@@ -699,7 +699,9 @@ class MockMaker
 		field.access.push(APublic);
 
 		var eMockConstructorExprs = createMockConstructorExprs();
-		var eReturn = isSpy ? eNull : EReturn().at();
+		var eReturn = macro {
+			if(!spy) return;
+		};
 		var e = EConst(CIdent("super")).at();
 
 		if (f.args.length == 0)
@@ -732,6 +734,7 @@ class MockMaker
 		f.args.push(spyArg);
 
 		//deliberately call return before call to super
+		//when this is not a spy
 		//to prevent target class constructor being executed
 		var exprs:Array<Expr> = [eMockConstructorExprs,eReturn, e];
 		f.expr = EBlock(exprs).at();
