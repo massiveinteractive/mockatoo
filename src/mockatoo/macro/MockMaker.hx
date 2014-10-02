@@ -699,7 +699,9 @@ class MockMaker
 		field.access.push(APublic);
 
 		var eMockConstructorExprs = createMockConstructorExprs();
-		var eReturn = isSpy ? eNull : EReturn().at();
+		var eReturn = macro {
+			if(!spy) return;
+		};
 		var e = EConst(CIdent("super")).at();
 
 		if (f.args.length == 0)
