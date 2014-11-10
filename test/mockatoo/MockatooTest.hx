@@ -62,6 +62,7 @@ class MockatooTest
 		addField(fields, "toFloat", args);
 		addField(fields, "toString", args);
 		addField(fields, "toDynamic", args);
+		addField(fields, "toMap", args);
 		addField(fields, "toVoid", args);
 
 		addField(fields, "toBoolWithArgs", toArgs(true));
@@ -73,6 +74,7 @@ class MockatooTest
 		addField(fields, "toStringWithArgs", toArgs("string"));
 
 		addField(fields, "toDynamicWithArgs", toArgs({name:"foo"}));
+		addField(fields, "toMapWithArgs", toArgs(new Map<String,Bool>()));
 
 		addField(fields, "toVoidWithArgs", toArgs(1));
 
@@ -754,6 +756,27 @@ class MockatooTest
 		var mock = Mockatoo.mock(ClassWithStaticMethodReference);
 		mock.callsStaticMethod();
 		Mockatoo.verify(mock.callsStaticMethod());
+	}
+
+	// @Test
+	// @Ignore("Triggers compilation error")
+	// public function should_mock_abstract()
+	// {
+	// 	var mock = Mockatoo.mock(AbstractInt);
+	// }
+
+	@Test
+	public function should_mock_class_with_abstract_property()
+	{
+		var instance = Mockatoo.mock(ClassWithAbstractProperties);
+	
+		Mockatoo.when(instance.test()).thenReturn(10);
+
+		Assert.areEqual(10, instance.test());
+
+		Mockatoo.when(instance.setter).thenReturn(1);
+
+		Assert.areEqual(1, instance.setter);
 	}
 
 	// ------------------------------------------------------------------------- utilities
